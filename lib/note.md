@@ -1,0 +1,1 @@
+* Prefer subrepos over copy*
