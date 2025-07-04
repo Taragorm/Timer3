@@ -1,0 +1,6 @@
+[submodule "lib/PsiCore"]
+	path = lib/PsiCore
+	url = https://github.com/Taragorm/PsiCore.git
+[submodule "lib/PsiBatt"]
+	path = lib/PsiBatt
+	url = https://github.com/Taragorm/PsiBatt

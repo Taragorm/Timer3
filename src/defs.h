@@ -9,6 +9,11 @@
 #ifndef IO_H_
 #define IO_H_
 
+#include <Arduino.h>
+#include <stdint.h>
+#include <Adafruit_SSD1306.h>
+
+
 // ATtiny1616 / ARDUINO
 //                          _____
 //                  VDD   1|*    |20  GND
@@ -49,34 +54,35 @@
 */
 
 
-#include <stdint.h>
-
-namespace Pins
+namespace Pin
 {
     // PA0 is UDPI
-    const uint8_t MOSI              = PIN_PA1;
-    const uint8_t MISO /*yum!*/     = PIN_PA2;
-    const uint8_t SCK               = PIN_PA3;
-    const uint8_t DISPL_DC          = PIN_PA4;
-    const uint8_t DISPL_CS          = PIN_PA5;
-    const uint8_t SOUND             = PIN_PA6; // DAC pin
-    const uint8_t VBATT             = PIN_PA7;
+    const int8_t MOSI              = PIN_PA1;
+    const int8_t MISO /*yum!*/     = PIN_PA2;
+    const int8_t SCK               = PIN_PA3;
+    const int8_t DISPL_DC          = PIN_PA4;
+    const int8_t DISPL_CS          = PIN_PA5;
+    const int8_t SOUND             = PIN_PA6; // DAC pin 
+    const int8_t VBATT             = PIN_PA7;
 
 
-    const uint8_t POWER_SW          = PIN_PB0;
-    const uint8_t KCLK              = PIN_PB1;
-    const uint8_t TX                = PIN_PB2;
-    const uint8_t RX                = PIN_PB3;
-    const uint8_t KRST              = PIN_PB4;
-    const uint8_t CHG_SENSE         = PIN_PB5;
+    const int8_t POWER_SW          = PIN_PB0;
+    const int8_t KCLK              = PIN_PB1;
+    const int8_t TX                = PIN_PB2;
+    const int8_t RX                = PIN_PB3;
+    const int8_t KRST              = PIN_PB4;
+    const int8_t CHG_SENSE         = PIN_PB5;
 
-    const uint8_t SOUND_EN          = PIN_PC0;
-    const uint8_t ISENSE            = PIN_PC1;
-    const uint8_t KBD0              = PIN_PC2;
-    const uint8_t KBD1              = PIN_PC3;
+    const int8_t SOUND_EN          = PIN_PC0;
+    const int8_t ISENSE            = PIN_PC1;
+    const int8_t KBD0              = PIN_PC2;
+    const int8_t KBD1              = PIN_PC3;
+
+    const int8_t NONE               = -1;
 }
 
 
+extern Adafruit_SSD1306 _gfx;
 
 
 #endif /* IO_H_ */
