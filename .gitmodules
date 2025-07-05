@@ -4,3 +4,12 @@
 [submodule "lib/PsiBatt"]
 	path = lib/PsiBatt
 	url = https://github.com/Taragorm/PsiBatt
+[submodule "lib/Adafruit-GFX-Library"]
+	path = lib/Adafruit-GFX-Library
+	url = https://github.com/Taragorm/Adafruit-GFX-Library.git
+[submodule "lib/Adafruit_SSD1306"]
+	path = lib/Adafruit_SSD1306
+	url = https://github.com/Taragorm/Adafruit_SSD1306.git
+[submodule "lib/Adafruit_BusIO"]
+	path = lib/Adafruit_BusIO
+	url = https://github.com/adafruit/Adafruit_BusIO.git

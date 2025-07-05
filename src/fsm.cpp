@@ -5,7 +5,7 @@
 static char base(char ch);
 static char getTmr(char ch, char min);
 static char getEditTmr(char ch);
-static char getNumber(char ch, uint8_t digits);
+static char getNumber(char ch, uint8_t digits, const char* def = nullptr);
 static char getMins(char ch);
 static char getTimes(char ch);
 static char beginNum(const char* prompt);
@@ -109,7 +109,7 @@ static char getEditTmr(char ch)
     return 1;
 }
 //---------------------------------------------------------
-static char getNumber(char ch, uint8_t digits)
+static char getNumber(char ch, uint8_t digits, const char* def)
 {
     bool done = false;
 
@@ -137,9 +137,18 @@ static char getNumber(char ch, uint8_t digits)
                 if(endPtr==numbuff)
                 {
                     // nothing entered
-                    fsm = base;
-                    clearPrompt();
-                    return 1;
+                    if(def)
+                    {
+                        strcpy(numbuff,def);
+                        done=true;
+                        break;
+                    }
+                    else
+                    {
+                        fsm = base;
+                        clearPrompt();
+                    }
+                    return -2;
                 }
                 done = true;
                 break;
@@ -187,7 +196,8 @@ static char getMins(char ch)
 //---------------------------------------------------------
 static char getTimes(char ch)
 {
-    char res = getNumber(ch,1);
+    char res = getNumber(ch,1,"1");
+
     if(res==-1)
     {
         auto times = (unsigned)atoi(numbuff);
@@ -205,6 +215,7 @@ static char getTimes(char ch)
         // what to do if running?
         tp->timer.mins = mins;
         tp->timer.times = times;
+        tp->rewind();
 
         clearPrompt();
 

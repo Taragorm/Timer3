@@ -43,12 +43,15 @@ Adafruit_SSD1306 _gfx(
             Pin::DISPL_DC,
             Pin::NONE,      // rst
             Pin::DISPL_CS, 
-            400000UL       // bitrate
+            8000000UL       // bitrate
             );
 
  
 RtcMilliTimer timer_(20, /*cyclic=*/ true);
 RtcMilliTimer slowTimer_(1000, /*cyclic=*/ true);
+
+SharedTickTimer _shutdownTimer(5*60, false);
+SharedTickTimer _silenceTimer(60, false);
 
 static void keyActions(uint16_t k);
 static void power(bool state);
@@ -58,12 +61,12 @@ static void mainActions();
 
 bool _powered;
 
-
 //-----------------------------------------------------------------
 void setup()
 {
+
     pinMode(Pin::SOUND_EN, OUTPUT);
-    digitalWriteFast(Pin::SOUND_EN, 1);
+    //digitalWriteFast(Pin::SOUND_EN, 1);
 
     pinMode(Pin::SOUND, OUTPUT);
     //digitalWrite( Pin::SOUND, true );
@@ -78,18 +81,19 @@ void setup()
     delay(250);
     Serial.println("Timer3");
     delay(100);
+    soundStaticInit();
     
     analogInit();
 
+    //_gfx.setFont((const GFXfont*) font);
     displayInit();
 
     soundInit();
     setFreq(0);
 
-    Serial.println("Init Done");
+    //Serial.println("Init Done");
 
     readAnalogs(true);
-
     if(_battPercent<30)
     {
         _gfx.printf("LOW BATTERY %u%%", _battPercent);
@@ -113,6 +117,7 @@ static void displayInit()
     _gfx.clearDisplay();
     _gfx.setCursor(0,0);
     _gfx.setTextColor(1,0);
+    _gfx.dim(true);
 }
 //-----------------------------------------------------------------
 void loop()
@@ -120,22 +125,24 @@ void loop()
 
     if(timer_.isExpired())
     {
-        _keypad.scan();
-        // //_keypad.dumpKeyMap();
+        soundLoop();
 
+        _keypad.scan();
 
         for(;;)
         {
             auto res = _keypad.keys();
             if(res== Kbd4017Rpt::NOKEY)
                 return;            
-            Serial.printf("%04x\r\n", res);
+
+            _shutdownTimer.reset();
             keyActions(res);
         }
     }
 
     if(slowTimer_.isExpired())
     {
+        SharedTickTimer::tick();
         mainActions();
     }
 
@@ -148,7 +155,9 @@ static void keyActions(uint16_t kc)
     switch(key)
     {
         case 'P':
-            if(state==0x51)
+            if(state==0)
+                playSound(-1);
+            else if(state==0x51)
                 sleep();
             break;
     }
@@ -160,7 +169,7 @@ static void keyActions(uint16_t kc)
         {
             resetFsm();
             clearPrompt();
-            // bleep
+            playSound(0);
         }
         else
         {
@@ -224,11 +233,13 @@ static void power(bool state)
         displayInit();        
         init_ADC0();
         init_ADC1();        
+        _shutdownTimer.reset();
+        _silenceTimer.reset();
     }
     else
     {
         digitalWriteFast(Pin::SOUND_EN, false);
-        setFreq(0);
+        playSound(-1);
 
         // disable the ADCs
         ADC0.CTRLA = 0;
@@ -251,20 +262,68 @@ static void mainActions()
     _gfx.setCursor(0,0);
     _gfx.printf("Batt %u%%\n", _battPercent );
 
+    bool running = false;
     auto tp = _timers;
     for(uint8_t i=0; i<TIMERCOUNT; ++i, ++tp)
     {
-        tp->tick();
+        if(!tp->isConfigured())
+            continue;
+
+        if(tp->running)
+        {
+            //Serial.printf("T%d running\r\n", i);
+            running = true;
+        }
+
+        if(tp->tick())
+        {
+            playSound(i+1);
+        }
         
-        _gfx.printf("T%d:%u*%3u", 
+        _gfx.printf("T%d %u*%03u %", 
                     i+1, 
                     tp->timer.times,
-                    tp->timer.mins
+                    tp->timer.mins                    
                     );
 
-        _gfx.print("\n");                     
+        _gfx.write(tp->stateChar());
+
+        if(tp->isConfigured())
+        {
+            _gfx.printf(" %d*%03um%02d", 
+                    tp->times,
+                    tp->mins,
+                    tp->secs
+                    );
+        }
+
+        _gfx.print("\n");                      
     }
 
     _gfx.display();
+
+    //
+    // shutup after a minute
+    if(isPlayingSound())
+    { 
+        if(_silenceTimer.isExpired())
+            playSound(-1);
+    }
+    else
+        _silenceTimer.reset();
+
+    //
+    // shutdown if nothing is happening
+    //Serial.printf("sdt=%d  tb=%d\r\n", _shutdownTimer.intervalExpired(), _shutdownTimer.ms());
+
+    if(running)
+        _shutdownTimer.reset();
+    else
+    {
+        if(_shutdownTimer.isExpired())
+        {
+            sleep();
+        }
+    }
 }
 //-----------------------------------------------------------------

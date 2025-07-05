@@ -46,6 +46,8 @@ struct Timer
     /// @brief Are we done?
     /// @return 
     bool isDone() const;
+
+    char stateChar() const;
 };
 //-------------------------------------------
 

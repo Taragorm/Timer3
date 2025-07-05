@@ -37,14 +37,14 @@ bool readAnalogs(bool first)
     {
         _battPercent =  LiPoMvToPercent(_battmv);
         ret = true;
-        Serial.printf("Volts raw=%u mV=%u percent=%u\r\n", raw, _battmv, _battPercent);
+        //Serial.printf("Volts raw=%u mV=%u percent=%u\r\n", raw, _battmv, _battPercent);
     }
     else if(_accumSamples==128)
     {
         _battMvAccum >>= 7;
 
         _battPercent =  LiPoMvToPercent(_battMvAccum );
-        Serial.printf("Volts accum mV=%lu percent=%u\r\n", _battMvAccum, _battPercent);
+        //Serial.printf("Volts accum mV=%lu percent=%u\r\n", _battMvAccum, _battPercent);
         _accumSamples = 0;
         _battMvAccum = 0;
         ret = true;

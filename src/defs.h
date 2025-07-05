@@ -84,5 +84,6 @@ namespace Pin
 
 extern Adafruit_SSD1306 _gfx;
 
+extern const unsigned char font[];
 
 #endif /* IO_H_ */

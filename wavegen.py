@@ -14,10 +14,10 @@ class Wave:
             self.points = vector
 
     def header(self, f):
-        f.write("const uint8_t {0}[];\r\n".format(self.name))
+        f.write("extern const uint8_t {0}[16];\r\n".format(self.name))
                 
     def cpp(self, f):
-        f.write("const uint8_t {0}[] = {{".format(self.name))
+        f.write("const uint8_t {0}[16] = {{".format(self.name))
         for i in range(0,SAM):
             if i>0:
                 f.write(",")
@@ -49,7 +49,7 @@ waves = [
 ]
 
 
-with open("waves.h", "w") as of:
+with open("src/waves.h", "w") as of:
     of.write("""
 #ifndef _WAVES_H
 #define _WAVES_H
@@ -60,7 +60,7 @@ with open("waves.h", "w") as of:
         w.header(of)
     of.write("#endif")
     
-with open("waves.cpp", "w") as of:
+with open("src/waves.cpp", "w") as of:
     of.write("""
 #include "waves.h"
              

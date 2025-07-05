@@ -1,4 +1,5 @@
 #include "timers.h"
+#include <Arduino.h>
 
 Timer _timers[TIMERCOUNT];
 
@@ -12,7 +13,9 @@ void Timer::rewind()
 //--------------------------------------------------
 void Timer::start()
 {
-    running = !isDone() && isConfigured();
+    if(isDone())
+        rewind();
+    running = isConfigured();
 }
 //--------------------------------------------------
 void Timer::stop()
@@ -36,12 +39,17 @@ bool Timer::tick()
     {
         if(mins==0)
         {
+            // not the first time
             ret = true;
+            --times; 
             if(times>0)
             {
                 mins = timer.mins-1;
                 secs = 59;
-                --times;
+            }
+            else
+            {
+                running = false;
             }
         }
         else
@@ -68,7 +76,19 @@ void Timer::clear()
 //--------------------------------------------------
 bool Timer::isConfigured() const
 {
-    return timer.mins==0 || timer.times==0;
+    return timer.mins!=0 && timer.times!=0;
+}
+//--------------------------------------------------
+char Timer::stateChar() const
+{
+    if(isDone())
+        return 0x80;
+
+    if(running)
+        return 0x82;
+    else
+        return 0x81;
+    
 }
 //--------------------------------------------------
 
