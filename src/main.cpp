@@ -270,7 +270,8 @@ static void mainActions()
     _gfx.fillRect(0,0,128,7*8, BLACK); // exclude the prompt line
 
     _gfx.setCursor(0,0);
-    _gfx.printf("Batt %u%%", _battPercent );
+    char bch = 0x83 + _battPercent/15;
+    _gfx.printf("%c %u%%", bch, _battPercent );
     if(_chargemA>4)
         _gfx.printf(" %umV %umA", _battmv, _chargemA );
     _gfx.println();
