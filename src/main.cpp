@@ -62,6 +62,20 @@ static void mainActions();
 bool _powered;
 
 //-----------------------------------------------------------------
+static void testBattLow()
+{
+    readAnalogs(true);
+    if(_battPercent<30)
+    {
+        _gfx.printf("LOW BATTERY %u%%", _battPercent);
+        _gfx.display();
+
+        setFreq(440);
+        delay(500);
+        setFreq(0);
+    }
+}
+//-----------------------------------------------------------------
 void setup()
 {
 
@@ -91,18 +105,9 @@ void setup()
     soundInit();
     setFreq(0);
 
+    testBattLow();
     //Serial.println("Init Done");
 
-    readAnalogs(true);
-    if(_battPercent<30)
-    {
-        _gfx.printf("LOW BATTERY %u%%", _battPercent);
-        _gfx.display();
-
-        setFreq(440);
-        delay(500);
-        setFreq(0);
-    }
 
 }
 //-----------------------------------------------------------------
@@ -219,6 +224,10 @@ static void sleep()
     
     //PORTC.INT
     power(true);
+    delay(100);
+
+    testBattLow();
+
 }
 //-----------------------------------------------------------------
 static void power(bool state)
@@ -260,7 +269,10 @@ static void mainActions()
     _gfx.fillRect(0,0,128,7*8, BLACK); // exclude the prompt line
 
     _gfx.setCursor(0,0);
-    _gfx.printf("Batt %u%%\n", _battPercent );
+    _gfx.printf("Batt %u%%", _battPercent );
+    if(_chargemA>4)
+        _gfx.printf(" %umV %umA", _battmv, _chargemA );
+    _gfx.println();
 
     bool running = false;
     auto tp = _timers;
