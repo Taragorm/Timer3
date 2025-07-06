@@ -65,6 +65,8 @@ bool _powered;
 static void testBattLow()
 {
     readAnalogs(true);
+    delay(100);
+    readAnalogs(true);
     if(_battPercent<30)
     {
         _gfx.printf("LOW BATTERY %u%%", _battPercent);
@@ -225,7 +227,6 @@ static void sleep()
     //PORTC.INT
     power(true);
     delay(100);
-
     testBattLow();
 
 }

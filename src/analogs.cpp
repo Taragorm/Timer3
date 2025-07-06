@@ -23,6 +23,13 @@ void analogInit()
     analogReference1(INTERNAL2V5);
 }
 //-------------------------------------------------------
+static void resetAccums()
+{
+    _accumSamples = 0;
+    _battMvAccum = 0;
+    _chmaAccum = 0;
+}
+//-------------------------------------------------------
 bool readAnalogs(bool first)
 {
     bool ret = false;
@@ -54,6 +61,7 @@ bool readAnalogs(bool first)
         _battPercent =  LiPoMvToPercent(battmv);
         _battmv = battmv;
         _chargemA = chargemA;
+        resetAccums();
         ret = true;
         //Serial.printf("Volts raw=%u mV=%u percent=%u\r\n", raw, _battmv, _battPercent);
     }
@@ -66,11 +74,11 @@ bool readAnalogs(bool first)
 
         _battPercent =  LiPoMvToPercent(_battMvAccum );
         _battmv = _battMvAccum;
+        _chargemA = _chmaAccum;
+
         //Serial.printf("Volts accum mV=%lu percent=%u\r\n", _battMvAccum, _battPercent);
-        _accumSamples = 0;
-        _battMvAccum = 0;
-
-
+        
+        resetAccums();
         ret = true;
     } 
     else
