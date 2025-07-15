@@ -106,6 +106,8 @@ void setup()
 
     soundInit();
     setFreq(0);
+    //setFreq(1000);
+    //digitalWrite( Pin::SOUND_EN, true );
 
     testBattLow();
     //Serial.println("Init Done");
@@ -159,6 +161,8 @@ static void keyActions(uint16_t kc)
 {
     char key = kc & Kbd4017Rpt::KEYMASK;
     char state = (kc & Kbd4017Rpt::RPTMASK) >> 8;
+    //Serial.printf("Key %c %d\r\n", key, state);
+
     switch(key)
     {
         case 'P':
